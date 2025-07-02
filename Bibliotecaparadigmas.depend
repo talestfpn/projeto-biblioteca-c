@@ -1,0 +1,16 @@
+# depslib dependency file v1.0
+1751464725 source:c:\users\tales\onedrive\Área de trabalho\bibliotecaparadigmas\main.c
+	<stdio.h>
+	<stdlib.h>
+	"biblioteca.h"
+
+1751220612 c:\users\tales\onedrive\Área de trabalho\bibliotecaparadigmas\biblioteca.h
+	<stdbool.h>
+
+1751464960 source:c:\users\tales\onedrive\Área de trabalho\bibliotecaparadigmas\biblioteca.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	"biblioteca.h"
+

@@ -1,0 +1,12 @@
+# Arquivos de compilação e executáveis
+*.o
+*.exe
+
+# Arquivos de configuração e dependências do Code::Blocks
+*.cbp
+*.depend
+*.layout
+
+# Pastas de build padrão
+bin/
+obj/
