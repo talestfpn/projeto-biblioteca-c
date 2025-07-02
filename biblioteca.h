@@ -1,9 +1,9 @@
 #ifndef BIBLIOTECA_H
 #define BIBLIOTECA_H
 
-#include <stdbool.h> // Necessário para usar o tipo 'bool' nas structs
+#include <stdbool.h>
 
-// --- Definição de Constantes Globais (Defines) ---
+// --- Definição de Constantes ---
 #define MAX_LIVROS 50
 #define MAX_USUARIOS 50
 #define MAX_TAMANHO 100
@@ -12,8 +12,6 @@
 
 // --- Definição das Estruturas de Dados ---
 
-
-// Estrutura para representar um Livro e seus atributos.
 typedef struct {
     char isbn[15];
     char titulo[MAX_TAMANHO];
@@ -22,7 +20,6 @@ typedef struct {
     char emprestado_para_cpf[15];
 } Livro;
 
-// Estrutura para representar um Usuário da biblioteca.
 typedef struct {
     char cpf[15];
     char nome[MAX_TAMANHO];
@@ -30,12 +27,12 @@ typedef struct {
 
 typedef struct {
     Livro livros[MAX_LIVROS];
-    int num_livros; // Contador para saber quantos livros realmente existem no array.
+    int num_livros;
     Usuario usuarios[MAX_USUARIOS];
-    int num_usuarios; // Contador para saber quantos usuarios realmente existem no array.
+    int num_usuarios;
 } Biblioteca;
 
-// --- Funções(Interface Pública do Módulo)---
+// --- Protótipos das Funções ---
 
 void limpar_buffer_entrada();
 void exibir_menu();
@@ -48,5 +45,9 @@ void realizar_emprestimo(Biblioteca *db);
 void realizar_devolucao(Biblioteca *db);
 void listar_livros(Biblioteca *db);
 void listar_usuarios(Biblioteca *db);
+
+// Novas funções para a interface de busca
+void apresentar_busca_livro(Biblioteca *db);
+void apresentar_busca_usuario(Biblioteca *db);
 
 #endif // BIBLIOTECA_H

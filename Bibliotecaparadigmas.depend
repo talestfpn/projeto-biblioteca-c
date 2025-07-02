@@ -14,3 +14,18 @@
 	<ctype.h>
 	"biblioteca.h"
 
+1751484718 source:c:\users\tales\downloads\bibliotecaparadigmas\biblioteca.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	"biblioteca.h"
+
+1751484396 c:\users\tales\downloads\bibliotecaparadigmas\biblioteca.h
+	<stdbool.h>
+
+1751484919 source:c:\users\tales\downloads\bibliotecaparadigmas\main.c
+	<stdio.h>
+	<stdlib.h>
+	"biblioteca.h"
+

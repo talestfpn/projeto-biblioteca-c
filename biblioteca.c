@@ -11,7 +11,6 @@ void limpar_buffer_entrada() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-// Função de interface, responsável apenas por exibir as opções ao usuário.
 void exibir_menu() {
     system("clear || cls");
     printf("====================================================\n");
@@ -19,20 +18,19 @@ void exibir_menu() {
     printf("||    BEM-VINDO AO SISTEMA DE BIBLIOTECA V1.0     ||\n");
     printf("||                                                ||\n");
     printf("====================================================\n");
-    printf("||                                                ||\n");
     printf("||  1. Cadastrar Livro                            ||\n");
     printf("||  2. Cadastrar Usuario                          ||\n");
     printf("||  3. Realizar Emprestimo                        ||\n");
     printf("||  4. Realizar Devolucao                         ||\n");
     printf("||  5. Listar Livros                              ||\n");
     printf("||  6. Listar Usuarios                            ||\n");
+    printf("||  7. Buscar Livro por ISBN                      ||\n");
+    printf("||  8. Buscar Usuario por CPF                     ||\n");
     printf("||  0. Sair                                       ||\n");
-    printf("||                                                ||\n");
     printf("====================================================\n");
     printf("Escolha uma opcao: ");
 }
 
-//Função de validação reutilizável garantindo que ambos os campos só aceitem números e tenham o tamanho exato.
 bool validar_string_somente_numeros(const char *str, int tamanho_exato) {
     if (strlen(str) != tamanho_exato) {
         return false;
@@ -45,9 +43,6 @@ bool validar_string_somente_numeros(const char *str, int tamanho_exato) {
     return true;
 }
 
-// mesmo isbn não pode funcionar
-
-// Função para o cadastro de livros, com validação de entrada.
 void cadastrar_livro(Biblioteca *db) {
     if (db->num_livros >= MAX_LIVROS) {
         printf("\nErro: Limite maximo de livros atingido!\n");
@@ -59,17 +54,23 @@ void cadastrar_livro(Biblioteca *db) {
 
     printf("\n--- Cadastro de Livro ---\n");
 
-// Loop de validação para garantir que o ISBN seja inserido corretamente.
     while (true) {
         printf("Digite o ISBN (%d digitos, somente numeros): ", TAMANHO_ISBN);
         fgets(buffer, sizeof(buffer), stdin);
         strtok(buffer, "\n");
-        if (validar_string_somente_numeros(buffer, TAMANHO_ISBN)) {
-            strcpy(novo_livro->isbn, buffer);
-            break;
-        } else {
+
+        if (!validar_string_somente_numeros(buffer, TAMANHO_ISBN)) {
             printf("ISBN invalido! Deve conter exatamente %d digitos numericos.\n", TAMANHO_ISBN);
+            continue;
         }
+
+        if (buscar_livro_por_isbn(db, buffer) != NULL) {
+            printf("Erro: Um livro com este ISBN ja existe no acervo.\n");
+            continue;
+        }
+
+        strcpy(novo_livro->isbn, buffer);
+        break;
     }
 
     printf("Digite o Titulo: ");
@@ -87,7 +88,6 @@ void cadastrar_livro(Biblioteca *db) {
     printf("\nLivro cadastrado com sucesso!\n");
 }
 
-// Lógica similar à de cadastrar_livro, com loop para validar o CPF)
 void cadastrar_usuario(Biblioteca *db) {
     if (db->num_usuarios >= MAX_USUARIOS) {
         printf("\nErro: Limite maximo de usuarios atingido!\n");
@@ -103,12 +103,19 @@ void cadastrar_usuario(Biblioteca *db) {
         printf("Digite o CPF (%d digitos, somente numeros): ", TAMANHO_CPF);
         fgets(buffer, sizeof(buffer), stdin);
         strtok(buffer, "\n");
-        if (validar_string_somente_numeros(buffer, TAMANHO_CPF)) {
-            strcpy(novo_usuario->cpf, buffer);
-            break;
-        } else {
+
+        if (!validar_string_somente_numeros(buffer, TAMANHO_CPF)) {
             printf("CPF invalido! Deve conter exatamente %d digitos numericos.\n", TAMANHO_CPF);
+            continue;
         }
+
+        if (buscar_usuario_por_cpf(db, buffer) != NULL) {
+            printf("Erro: Um usuario com este CPF ja esta cadastrado.\n");
+            continue;
+        }
+
+        strcpy(novo_usuario->cpf, buffer);
+        break;
     }
 
     printf("Digite o Nome do usuario: ");
@@ -120,7 +127,6 @@ void cadastrar_usuario(Biblioteca *db) {
     printf("\nUsuario cadastrado com sucesso!\n");
 }
 
-//Função de busca que retorna um ponteiro.
 Livro* buscar_livro_por_isbn(Biblioteca *db, const char *isbn) {
     for (int i = 0; i < db->num_livros; i++) {
         if (strcmp(db->livros[i].isbn, isbn) == 0) {
@@ -130,7 +136,6 @@ Livro* buscar_livro_por_isbn(Biblioteca *db, const char *isbn) {
     return NULL;
 }
 
-// Lógica idêntica à busca por ISBN, mas para usuários)
 Usuario* buscar_usuario_por_cpf(Biblioteca *db, const char *cpf) {
     for (int i = 0; i < db->num_usuarios; i++) {
         if (strcmp(db->usuarios[i].cpf, cpf) == 0) {
@@ -140,7 +145,6 @@ Usuario* buscar_usuario_por_cpf(Biblioteca *db, const char *cpf) {
     return NULL;
 }
 
-// Função que combina várias lógicas: busca, validação de status e alteração de estado.
 void realizar_emprestimo(Biblioteca *db) {
     char isbn[15];
     char cpf[15];
@@ -150,10 +154,8 @@ void realizar_emprestimo(Biblioteca *db) {
     fgets(isbn, sizeof(isbn), stdin);
     strtok(isbn, "\n");
 
-// Passo 1: Encontrar o livro e validar se ele existe.
     Livro *livro = buscar_livro_por_isbn(db, isbn);
 
-// Passo 2: Validar o estado do livro (se está disponível).
     if (livro == NULL) {
         printf("Erro: Livro com este ISBN nao encontrado.\n");
         return;
@@ -167,21 +169,18 @@ void realizar_emprestimo(Biblioteca *db) {
     fgets(cpf, sizeof(cpf), stdin);
     strtok(cpf, "\n");
 
-// Passo 3: Encontrar o usuário e validar se ele existe.
     Usuario *usuario = buscar_usuario_por_cpf(db, cpf);
     if (usuario == NULL) {
         printf("Erro: Usuario com este CPF nao encontrado.\n");
         return;
     }
 
-// Passo 4: Alterar o estado do sistema (o efeito colateral da função).
     livro->disponivel = false;
     strcpy(livro->emprestado_para_cpf, cpf);
 
     printf("\nEmprestimo do livro '%s' para o usuario '%s' (CPF: %s) realizado com sucesso!\n", livro->titulo, usuario->nome, usuario->cpf);
 }
 
-// Ação principal da devolução: reverter o estado do livro.
 void realizar_devolucao(Biblioteca *db) {
     char isbn[15];
 
@@ -206,7 +205,6 @@ void realizar_devolucao(Biblioteca *db) {
     livro->emprestado_para_cpf[0] = '\0';
 }
 
-//Funções de listagem, usamos um operador ternário para formatar a saída.
 void listar_livros(Biblioteca *db) {
     printf("\n--- Lista de Livros (%d) ---\n", db->num_livros);
     if (db->num_livros == 0) {
@@ -238,5 +236,66 @@ void listar_usuarios(Biblioteca *db) {
         printf("CPF: %s | Nome: %s\n",
                db->usuarios[i].cpf,
                db->usuarios[i].nome);
+    }
+}
+
+// --- ALTERAÇÃO AQUI ---
+void apresentar_busca_livro(Biblioteca *db) {
+    char isbn[15];
+    printf("\n--- Buscar Livro por ISBN ---\n");
+
+    while(true) {
+        printf("Digite o ISBN do livro a ser buscado (%d digitos): ", TAMANHO_ISBN);
+        fgets(isbn, sizeof(isbn), stdin);
+        strtok(isbn, "\n");
+
+        if(validar_string_somente_numeros(isbn, TAMANHO_ISBN)) {
+            break; // Se for válido, sai do loop
+        } else {
+            printf("ISBN invalido! Deve conter exatamente %d digitos numericos.\n", TAMANHO_ISBN);
+        }
+    }
+
+    Livro *livro = buscar_livro_por_isbn(db, isbn);
+
+    if (livro == NULL) {
+        printf("\nNenhum livro encontrado com o ISBN: %s\n", isbn);
+    } else {
+        printf("\n--- Livro Encontrado ---\n");
+        printf("ISBN: %s\n", livro->isbn);
+        printf("Titulo: %s\n", livro->titulo);
+        printf("Autor: %s\n", livro->autor);
+        printf("Status: %s\n", livro->disponivel ? "Disponivel" : "Emprestado");
+        if (!livro->disponivel) {
+            printf("Emprestado para o CPF: %s\n", livro->emprestado_para_cpf);
+        }
+    }
+}
+
+// --- ALTERAÇÃO AQUI ---
+void apresentar_busca_usuario(Biblioteca *db) {
+    char cpf[15];
+    printf("\n--- Buscar Usuario por CPF ---\n");
+
+    while(true) {
+        printf("Digite o CPF do usuario a ser buscado (%d digitos): ", TAMANHO_CPF);
+        fgets(cpf, sizeof(cpf), stdin);
+        strtok(cpf, "\n");
+
+        if(validar_string_somente_numeros(cpf, TAMANHO_CPF)) {
+            break; // Se for válido, sai do loop
+        } else {
+            printf("CPF invalido! Deve conter exatamente %d digitos numericos.\n", TAMANHO_CPF);
+        }
+    }
+
+    Usuario *usuario = buscar_usuario_por_cpf(db, cpf);
+
+    if (usuario == NULL) {
+        printf("\nNenhum usuario encontrado com o CPF: %s\n", cpf);
+    } else {
+        printf("\n--- Usuario Encontrado ---\n");
+        printf("CPF: %s\n", usuario->cpf);
+        printf("Nome: %s\n", usuario->nome);
     }
 }
