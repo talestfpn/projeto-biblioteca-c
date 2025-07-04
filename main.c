@@ -3,7 +3,7 @@
 #include "biblioteca.h" // Inclui nosso módulo de biblioteca
 
 int main() {
-// Bloco novo com dados pré-carregados
+// Bloco com dados pré-carregados
 Biblioteca minha_biblioteca = {
     // Inicializando a lista de livros
     .livros = {
@@ -23,9 +23,10 @@ Biblioteca minha_biblioteca = {
 
     int opcao;
 
+    //Laço Principal (Main Loop) - while(true) mantém o programa rodando
     while (true) {
         exibir_menu();
-        if (scanf("%d", &opcao) != 1) {
+        if (scanf("%d", &opcao) != 1) { // Leitura e validação da entrada do usuário.
             printf("Entrada invalida! Por favor, digite um numero.\n");
             limpar_buffer_entrada();
             printf("\nPressione Enter para continuar...");
@@ -34,6 +35,7 @@ Biblioteca minha_biblioteca = {
         }
         limpar_buffer_entrada();
 
+        // 3. Seleção da Ação (Dispatcher)
         switch (opcao) {
             case 1: cadastrar_livro(&minha_biblioteca); break;
             case 2: cadastrar_usuario(&minha_biblioteca); break;
@@ -46,7 +48,7 @@ Biblioteca minha_biblioteca = {
             case 8: apresentar_busca_usuario(&minha_biblioteca); break;
             case 0:
                 printf("\nObrigado por utilizar o sistema! Saindo...\n");
-                exit(0);
+                exit(0); // `exit(0)` termina o programa imediatamente. O 0 indica que a saída foi bem-sucedida
             default:
                 printf("\nOpcao invalida! Tente novamente.\n");
                 break;
